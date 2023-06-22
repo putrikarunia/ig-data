@@ -2,7 +2,6 @@ const callAPI = async () => {
 
   const txt = document.documentElement.innerHTML;
   const username = window.location.pathname.replace(/^\/|\/$/g, '');
-  console.log({ username })
 
   let cookie = {};
   document.cookie.split(';').forEach(function (el) {
@@ -27,7 +26,6 @@ const callAPI = async () => {
   }
 
   const result = await req.json();
-  console.log({ result })
   insertData(result?.data?.user)
 }
 
@@ -82,6 +80,8 @@ const tags = [
   "Newsletter",
   "Guide",
   "Freelancer",
+  "Digital Products",
+  "Membership"
 ]
 
 const industry = [
@@ -100,6 +100,14 @@ const industry = [
   "Corporate",
   "Finance",
   "YouTuber",
+  "Photography / Videography",
+  "Canva",
+]
+
+const picList = [
+  "Putri",
+  "Michelle",
+  "Kevin",
 ]
 
 const insertData = function (data) {
@@ -168,6 +176,27 @@ const insertData = function (data) {
           </label>`).join("")}
         </div>
       </div>
+
+      <div class="field">
+        <label class="label">Need LIB Rebuild</label>
+        <div class="control">
+          <label class="checkbox" style="color: black;">
+            <input id="td-lead-lib-rebuild" type="checkbox" style="margin-right: 2px">
+            Yes, need to rebuild link in bio for this person
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+      <label class="label">Person in Charge</label>
+      <div class="control">
+        <div class="select">
+          <select id="td-lead-pic">
+            ${picList?.map(person => `<option>${person}</option>`).join("")}
+          </select>
+        </div>
+      </div>
+    </div>
     `
 
 
@@ -180,7 +209,9 @@ const insertData = function (data) {
       button.classList.add("is-loading");
       const name = document.getElementById("td-lead-name").value;
       const email = document.getElementById("td-lead-email").value;
-      const link = document.getElementById("td-lead-links").value;
+      const link = document.getElementById("td-lead-links").value || "";
+      const pic = document.getElementById("td-lead-pic").value;
+      const needLIBRebuild = document.getElementById("td-lead-lib-rebuild").checked;
 
       const tagsCheckboxes = document.querySelectorAll('input[name="td-lead-tags"]');
       const tags = Array.from(tagsCheckboxes, (checkbox) => checkbox.checked ? checkbox.value : null).filter(x => !!x);
@@ -196,12 +227,14 @@ const insertData = function (data) {
           email,
           link,
           tags,
-          industry
+          industry,
+          pic,
+          needLIBRebuild
         }
       }
 
       try {
-        const resp = await fetch("http://localhost:3002/api/instagram", {
+        const resp = await fetch("https://admin.typedream.dev/api/instagram", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
